@@ -45,24 +45,25 @@ def main():
     end_update = utc_time(0)
     try:
         df = pd.read_csv(DATA_CSV_FILE, index_col=0)
-        last_update = df.index.values[-1]
-        datetime_object = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S%z')
-        update_on = datetime_object
-
-        update_df = get_dataframe(good_correlation_metrics, SLUG, update_on, end_update, QUERY_INTERVAL)
-        df.index = pd.to_datetime(df.index)
-        update_df = pd.concat((df, update_df)).groupby('datetime').max()
-
-        if update_df.empty:
-            print("There is no data to update")
-        else:
-            update_df.to_csv(DATA_CSV_FILE)
-            print(f'Data saved successfully on {DATA_CSV_FILE}')
 
     except FileNotFoundError: 
         df = get_dataframe(good_correlation_metrics, SLUG, FIRST_QUERY_FROME_DATE, end_update, QUERY_INTERVAL)
         df.to_csv(DATA_CSV_FILE)
         print(f'Initially saved successfully on {DATA_CSV_FILE}')
+
+    last_update = df.index.values[-1]
+    datetime_object = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S%z')
+    update_on = datetime_object
+
+    update_df = get_dataframe(good_correlation_metrics, SLUG, update_on, end_update, QUERY_INTERVAL)
+    df.index = pd.to_datetime(df.index)
+    update_df = pd.concat((df, update_df)).groupby('datetime').max()
+
+    if update_df.empty:
+        print("There is no data to update")
+    else:
+        update_df.to_csv(DATA_CSV_FILE)
+        print(f'Data saved successfully on {DATA_CSV_FILE}')
 
 if __name__ == '__main__':
     # execute a Python script after every N minutes

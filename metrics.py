@@ -29,21 +29,20 @@ def main():
     for metric in all_metrics:
         
         try: 
-            data = get_data(metric, SLUG, FROM_DATE, now, INTERVAL)
+            data = get_data(metric, SLUG, FROM_DATE, now, INTERVAL)      
             data = data.rename(columns = {'value': metric})
             df = price.join(data, on='datetime', how='inner')
 
             price_values = df.price_usd.values
-            data_values = df[metric].values
-
-            correlation = pearsonr(price_values, data_values)
-            new_row = {'metric': metric, 'correlation': correlation.statistic, 'pvalue': correlation.pvalue}
-            print(new_row)
-            correlation_df = correlation_df.append(new_row , ignore_index=True)
-            
+            data_values = df[metric].values 
+            correlation = pearsonr(price_values, data_values)    
         except Exception as e:
             print(e)
             pass
+
+        new_row = {'metric': metric, 'correlation': correlation.statistic, 'pvalue': correlation.pvalue}
+        print(new_row)
+        correlation_df = correlation_df.append(new_row , ignore_index=True)
         
     # save results
     correlation_df.to_csv(METRICS_CORRELATION_FILE)
